@@ -51,8 +51,8 @@ app.openapi = custom_openapi
 # FastAPI에 CORS 예외 URL을 등록
 origins = [
     #"http://127.0.0.1:5173",    # 또는 "http://localhost:5173"
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
 
 app.add_middleware(
@@ -78,7 +78,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close()  # 명시적으로 연결 종료
 
 
-app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_router)
 
 
 if __name__ == "__main__":

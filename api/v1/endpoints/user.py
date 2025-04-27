@@ -71,6 +71,8 @@ async def update_profile(
         user_id: str = Depends(get_current_user), # get_current_user handles token extraction
         db=Depends(get_db),
 ):
+    print('profile object:', profile)
+    print('profile.illnesses:', profile.illnesses)
     await db["users"].update_one(
         {"_id": ObjectId(user_id)},# _id가 user_id인 문서를 찾아서,
         {"$set": profile.model_dump(exclude_unset=True)}
