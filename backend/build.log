@@ -1,0 +1,206 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 640B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.10-alpine
+#2 DONE 1.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/6] FROM docker.io/library/python:3.10-alpine@sha256:0733909561f552d8557618ee738b2a5cbf3fddfddf92c0fb261b293b90a51f12
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 2.96kB done
+#5 DONE 0.0s
+
+#6 [2/6] RUN apk add --no-cache gcc musl-dev libffi-dev libxml2-dev libxslt-dev openssl-dev python3-dev cargo
+#6 0.278 fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/x86_64/APKINDEX.tar.gz
+#6 0.464 fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/x86_64/APKINDEX.tar.gz
+#6 0.975 (1/45) Installing libgcc (14.2.0-r4)
+#6 0.987 (2/45) Installing jansson (2.14-r4)
+#6 0.992 (3/45) Installing libstdc++ (14.2.0-r4)
+#6 1.023 (4/45) Installing zstd-libs (1.5.6-r2)
+#6 1.038 (5/45) Installing binutils (2.43.1-r2)
+#6 1.154 (6/45) Installing libgomp (14.2.0-r4)
+#6 1.164 (7/45) Installing libatomic (14.2.0-r4)
+#6 1.168 (8/45) Installing gmp (6.3.0-r2)
+#6 1.257 (9/45) Installing isl26 (0.26-r1)
+#6 1.283 (10/45) Installing mpfr4 (4.2.1-r0)
+#6 1.295 (11/45) Installing mpc1 (1.3.1-r1)
+#6 1.301 (12/45) Installing gcc (14.2.0-r4)
+#6 2.648 (13/45) Installing musl-dev (1.2.5-r9)
+#6 2.748 (14/45) Installing libxml2 (2.13.4-r5)
+#6 2.765 (15/45) Installing llvm19-libs (19.1.4-r1)
+#6 4.272 (16/45) Installing scudo-malloc (19.1.4-r0)
+#6 4.278 (17/45) Installing rust (1.83.0-r0)
+#6 6.004 (18/45) Installing brotli-libs (1.1.0-r2)
+#6 6.019 (19/45) Installing c-ares (1.34.5-r0)
+#6 6.026 (20/45) Installing libunistring (1.2-r0)
+#6 6.045 (21/45) Installing libidn2 (2.3.7-r0)
+#6 6.052 (22/45) Installing nghttp2-libs (1.64.0-r0)
+#6 6.058 (23/45) Installing libpsl (0.21.5-r3)
+#6 6.063 (24/45) Installing libcurl (8.12.1-r1)
+#6 6.075 (25/45) Installing cargo (1.83.0-r0)
+#6 6.302 (26/45) Installing linux-headers (6.6-r1)
+#6 6.452 (27/45) Installing pkgconf (2.3.0-r0)
+#6 6.458 (28/45) Installing libffi-dev (3.4.7-r0)
+#6 6.465 (29/45) Installing zlib-dev (1.3.1-r2)
+#6 6.470 (30/45) Installing xz (5.6.3-r1)
+#6 6.479 (31/45) Installing xz-dev (5.6.3-r1)
+#6 6.486 (32/45) Installing libxml2-utils (2.13.4-r5)
+#6 6.491 (33/45) Installing libxml2-dev (2.13.4-r5)
+#6 6.504 (34/45) Installing libgpg-error (1.51-r0)
+#6 6.510 (35/45) Installing libgcrypt (1.10.3-r1)
+#6 6.526 (36/45) Installing libxslt (1.1.42-r2)
+#6 6.535 (37/45) Installing libxslt-dev (1.1.42-r2)
+#6 6.543 (38/45) Installing openssl-dev (3.3.3-r0)
+#6 6.585 (39/45) Installing libexpat (2.7.0-r0)
+#6 6.591 (40/45) Installing mpdecimal (4.0.0-r0)
+#6 6.598 (41/45) Installing python3 (3.12.10-r0)
+#6 6.878 (42/45) Installing python3-pycache-pyc0 (3.12.10-r0)
+#6 7.046 (43/45) Installing pyc (3.12.10-r0)
+#6 7.046 (44/45) Installing python3-pyc (3.12.10-r0)
+#6 7.046 (45/45) Installing python3-dev (3.12.10-r0)
+#6 7.786 Executing busybox-1.37.0-r12.trigger
+#6 7.805 OK: 680 MiB in 82 packages
+#6 DONE 11.9s
+
+#7 [3/6] WORKDIR /app
+#7 DONE 0.0s
+
+#8 [4/6] COPY requirements.txt .
+#8 DONE 0.0s
+
+#9 [5/6] RUN pip install --upgrade pip && pip install -r requirements.txt
+#9 3.783 Requirement already satisfied: pip in /usr/local/lib/python3.10/site-packages (23.0.1)
+#9 3.930 Collecting pip
+#9 3.998   Downloading pip-25.0.1-py3-none-any.whl (1.8 MB)
+#9 4.065      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 29.9 MB/s eta 0:00:00
+#9 4.161 Installing collected packages: pip
+#9 4.162   Attempting uninstall: pip
+#9 4.163     Found existing installation: pip 23.0.1
+#9 4.447     Uninstalling pip-23.0.1:
+#9 4.722       Successfully uninstalled pip-23.0.1
+#9 6.543 Successfully installed pip-25.0.1
+#9 6.544 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#9 7.650 Collecting PyJWT==2.10.1 (from -r requirements.txt (line 1))
+#9 7.689   Downloading PyJWT-2.10.1-py3-none-any.whl.metadata (4.0 kB)
+#9 7.791 Collecting PyYAML==6.0.2 (from -r requirements.txt (line 2))
+#9 7.799   Downloading PyYAML-6.0.2-cp310-cp310-musllinux_1_1_x86_64.whl.metadata (2.1 kB)
+#9 7.825 Collecting annotated-types==0.7.0 (from -r requirements.txt (line 3))
+#9 7.833   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+#9 7.876 Collecting anyio==4.9.0 (from -r requirements.txt (line 4))
+#9 7.883   Downloading anyio-4.9.0-py3-none-any.whl.metadata (4.7 kB)
+#9 7.969 Collecting bcrypt==3.2.2 (from -r requirements.txt (line 5))
+#9 8.165   Downloading bcrypt-3.2.2-cp36-abi3-musllinux_1_1_x86_64.whl.metadata (8.3 kB)
+#9 8.347 Collecting cffi==1.17.1 (from -r requirements.txt (line 6))
+#9 8.354   Downloading cffi-1.17.1-cp310-cp310-musllinux_1_1_x86_64.whl.metadata (1.5 kB)
+#9 8.397 Collecting click==8.1.8 (from -r requirements.txt (line 7))
+#9 8.404   Downloading click-8.1.8-py3-none-any.whl.metadata (2.3 kB)
+#9 8.444 Collecting colorama==0.4.6 (from -r requirements.txt (line 8))
+#9 8.451   Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+#9 8.719 Collecting cryptography==44.0.2 (from -r requirements.txt (line 9))
+#9 8.726   Downloading cryptography-44.0.2-cp39-abi3-musllinux_1_2_x86_64.whl.metadata (5.7 kB)
+#9 8.771 Collecting dnspython==2.7.0 (from -r requirements.txt (line 10))
+#9 8.778   Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
+#9 8.820 Collecting ecdsa==0.19.1 (from -r requirements.txt (line 11))
+#9 8.828   Downloading ecdsa-0.19.1-py2.py3-none-any.whl.metadata (29 kB)
+#9 8.864 Collecting email_validator==2.2.0 (from -r requirements.txt (line 12))
+#9 8.871   Downloading email_validator-2.2.0-py3-none-any.whl.metadata (25 kB)
+#9 8.904 Collecting exceptiongroup==1.2.2 (from -r requirements.txt (line 13))
+#9 8.911   Downloading exceptiongroup-1.2.2-py3-none-any.whl.metadata (6.6 kB)
+#9 8.998 Collecting fastapi==0.115.12 (from -r requirements.txt (line 14))
+#9 9.005   Downloading fastapi-0.115.12-py3-none-any.whl.metadata (27 kB)
+#9 9.044 Collecting h11==0.16.0 (from -r requirements.txt (line 15))
+#9 9.050   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#9 9.109 Collecting httptools==0.6.4 (from -r requirements.txt (line 16))
+#9 9.117   Downloading httptools-0.6.4-cp310-cp310-musllinux_1_2_x86_64.whl.metadata (3.6 kB)
+#9 9.150 Collecting idna==3.10 (from -r requirements.txt (line 17))
+#9 9.157   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+#9 9.391 Collecting motor==3.7.0 (from -r requirements.txt (line 18))
+#9 9.397   Downloading motor-3.7.0-py3-none-any.whl.metadata (21 kB)
+#9 9.439 Collecting passlib==1.7.4 (from -r requirements.txt (line 19))
+#9 9.447   Downloading passlib-1.7.4-py2.py3-none-any.whl.metadata (1.7 kB)
+#9 9.499 Collecting pyasn1==0.6.1 (from -r requirements.txt (line 20))
+#9 9.507   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+#9 9.535 Collecting pycparser==2.22 (from -r requirements.txt (line 21))
+#9 9.542   Downloading pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+#9 9.775 Collecting pydantic==2.11.3 (from -r requirements.txt (line 22))
+#9 9.782   Downloading pydantic-2.11.3-py3-none-any.whl.metadata (65 kB)
+#9 9.823 Collecting pydantic-settings==2.9.1 (from -r requirements.txt (line 23))
+#9 9.830   Downloading pydantic_settings-2.9.1-py3-none-any.whl.metadata (3.8 kB)
+#9 10.87 Collecting pydantic_core==2.34.1 (from -r requirements.txt (line 24))
+#9 10.88   Downloading pydantic_core-2.34.1-cp310-cp310-musllinux_1_1_x86_64.whl.metadata (6.8 kB)
+#9 11.38 Collecting pymongo==4.12.0 (from -r requirements.txt (line 25))
+#9 11.39   Downloading pymongo-4.12.0.tar.gz (2.2 MB)
+#9 11.42      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 75.8 MB/s eta 0:00:00
+#9 12.34   Installing build dependencies: started
+#9 15.91   Installing build dependencies: finished with status 'done'
+#9 15.91   Getting requirements to build wheel: started
+#9 16.07   Getting requirements to build wheel: finished with status 'done'
+#9 16.07   Preparing metadata (pyproject.toml): started
+#9 23.41   Preparing metadata (pyproject.toml): finished with status 'done'
+#9 23.46 Collecting python-dotenv==1.1.0 (from -r requirements.txt (line 26))
+#9 23.47   Downloading python_dotenv-1.1.0-py3-none-any.whl.metadata (24 kB)
+#9 23.50 Collecting python-jose==3.4.0 (from -r requirements.txt (line 27))
+#9 23.51   Downloading python_jose-3.4.0-py2.py3-none-any.whl.metadata (5.5 kB)
+#9 23.54 Collecting python-multipart==0.0.20 (from -r requirements.txt (line 28))
+#9 23.55   Downloading python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+#9 23.58 Collecting rsa==4.9.1 (from -r requirements.txt (line 29))
+#9 23.59   Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+#9 23.62 Collecting six==1.17.0 (from -r requirements.txt (line 30))
+#9 23.63   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#9 23.65 Collecting sniffio==1.3.1 (from -r requirements.txt (line 31))
+#9 23.66   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+#9 23.72 Collecting starlette==0.46.2 (from -r requirements.txt (line 32))
+#9 23.72   Downloading starlette-0.46.2-py3-none-any.whl.metadata (6.2 kB)
+#9 23.75 Collecting typing-inspection==0.4.0 (from -r requirements.txt (line 33))
+#9 23.76   Downloading typing_inspection-0.4.0-py3-none-any.whl.metadata (2.6 kB)
+#9 23.80 Collecting typing_extensions==4.13.2 (from -r requirements.txt (line 34))
+#9 23.81   Downloading typing_extensions-4.13.2-py3-none-any.whl.metadata (3.0 kB)
+#9 23.86 Collecting uvicorn==0.34.2 (from -r requirements.txt (line 35))
+#9 23.87   Downloading uvicorn-0.34.2-py3-none-any.whl.metadata (6.5 kB)
+#9 23.99 Collecting watchfiles==1.0.5 (from -r requirements.txt (line 36))
+#9 24.00   Downloading watchfiles-1.0.5-cp310-cp310-musllinux_1_1_x86_64.whl.metadata (4.9 kB)
+#9 24.16 Collecting websockets==15.0.1 (from -r requirements.txt (line 37))
+#9 24.17   Downloading websockets-15.0.1-cp310-cp310-musllinux_1_2_x86_64.whl.metadata (6.8 kB)
+#9 24.32 INFO: pip is looking at multiple versions of pydantic to determine which version is compatible with other requirements. This could take a while.
+#9 24.32 ERROR: Cannot install -r requirements.txt (line 22) and pydantic_core==2.34.1 because these package versions have conflicting dependencies.
+#9 24.32 
+#9 24.32 The conflict is caused by:
+#9 24.32     The user requested pydantic_core==2.34.1
+#9 24.32     pydantic 2.11.3 depends on pydantic-core==2.33.1
+#9 24.32 
+#9 24.32 To fix this you could try to:
+#9 24.32 1. loosen the range of package versions you've specified
+#9 24.32 2. remove package versions to allow pip to attempt to solve the dependency conflict
+#9 24.32 
+#9 24.35 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+#9 ERROR: process "/bin/sh -c pip install --upgrade pip && pip install -r requirements.txt" did not complete successfully: exit code: 1
+------
+ > [5/6] RUN pip install --upgrade pip && pip install -r requirements.txt:
+24.32 
+24.32 The conflict is caused by:
+24.32     The user requested pydantic_core==2.34.1
+24.32     pydantic 2.11.3 depends on pydantic-core==2.33.1
+24.32 
+24.32 To fix this you could try to:
+24.32 1. loosen the range of package versions you've specified
+24.32 2. remove package versions to allow pip to attempt to solve the dependency conflict
+24.32 
+24.35 ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
+------
+Dockerfile:13
+--------------------
+  11 |     COPY requirements.txt .
+  12 |     
+  13 | >>> RUN pip install --upgrade pip && pip install -r requirements.txt
+  14 |     
+  15 |     # 애플리케이션 파일 복사
+--------------------
+ERROR: failed to solve: process "/bin/sh -c pip install --upgrade pip && pip install -r requirements.txt" did not complete successfully: exit code: 1
