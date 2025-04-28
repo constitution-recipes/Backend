@@ -17,6 +17,7 @@ class UserProfileUpdate(BaseModel):
     allergies: List[str]
     health_status: str
     illnesses: str
+    health_goals: Optional[List[str]] = None
 
 
 class UserOut(BaseModel):
