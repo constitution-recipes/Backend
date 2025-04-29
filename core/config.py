@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str  # 비밀 키
     ALGORITHM: str  # 기본 알고리즘 설정 (선택사항)
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    AI_DATA_URL: str
 
     class Config:
         # .env 파일에서 환경변수를 읽어옵니다.
@@ -22,3 +23,4 @@ MONGO_DB_NAME = settings.MONGO_DB_NAME
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+AI_DATA_URL = settings.AI_DATA_URL

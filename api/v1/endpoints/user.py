@@ -11,7 +11,9 @@ from db.session import get_db  # DB 세션을 가져오는 함수
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import Form
-
+from pydantic import BaseModel
+import requests
+from core.config import AI_DATA_URL
 router = APIRouter()
 
 @router.get("/email-exists")
@@ -128,3 +130,37 @@ async def logout():
 @router.post("/token")
 async def login():
     return {"access_token": "test", "token_type": "bearer"}
+
+# Chat proxy models
+class ChatProxyRequest(BaseModel):
+    messages: list[dict[str, str]]
+
+class ChatProxyResponse(BaseModel):
+    message: str
+
+
+@router.post("/chat", response_model=ChatProxyResponse)
+async def proxy_chat(req: ChatProxyRequest):
+    try:
+        print(f"AI_DATA_URL: {AI_DATA_URL}")
+        print(f"req: {req.dict()}")
+        url = f"{AI_DATA_URL}/chat"
+        # messages 구조 보장
+        payload = {"messages": [{"role": m["role"], "content": m["content"]} for m in req.messages]}
+        resp = requests.post(url, json=payload, timeout=10)
+        print(f"status_code: {resp.status_code}")
+        try:
+            data = resp.json()
+            print(f"data: {data}")
+        except Exception as json_err:
+            print(f"JSON decode error: {json_err}")
+            print(f"Response text: {resp.text}")
+            raise HTTPException(status_code=500, detail=f"AI 서버 응답이 JSON이 아님: {resp.text}")
+
+        resp.raise_for_status()
+        if "message" not in data:
+            raise HTTPException(status_code=500, detail=f"AI 서버 응답에 'message' 필드가 없음: {data}")
+        return ChatProxyResponse(message=data["message"])
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
