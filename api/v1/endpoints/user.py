@@ -1,5 +1,5 @@
 # api/v1/endpoints/user.py
-from fastapi import APIRouter, HTTPException, Depends, Security
+from fastapi import APIRouter, HTTPException, Depends, Security, status, Query
 from fastapi.security import APIKeyHeader, OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from schemas.user import Token, SignupResponse  # 또는 schemas.user에서 정의했다면 해당 위치에서 import
@@ -14,12 +14,17 @@ from fastapi import Form
 
 router = APIRouter()
 
+@router.get("/email-exists")
+async def email_exists(email: str = Query(...), db=Depends(get_db)):
+    existing_user = await db["users"].find_one({"email": email})
+    return {"exists": existing_user is not None}
+
 @router.post("/signup", response_model=SignupResponse)
 async def signup(user: UserCreate, db=Depends(get_db)):
     # 이메일 중복 체크
     existing_user = await db["users"].find_one({"email": user.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
     # 비밀번호
     user.password = hash_password(user.password)

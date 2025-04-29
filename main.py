@@ -48,16 +48,16 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-# FastAPI에 CORS 예외 URL을 등록
-origins = [
-    #"http://127.0.0.1:5173",    # 또는 "http://localhost:5173"
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-]
+# # FastAPI에 CORS 예외 URL을 등록
+# origins = [
+#     #"http://127.0.0.1:5173",    # 또는 "http://localhost:5173"
+#     "http://localhost:3001",
+#     "http://127.0.0.1:3001",
+# ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # 모든 origin 허용 (개발용)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -85,4 +85,4 @@ if __name__ == "__main__":
     # Windows 환경에서만 이벤트 루프 정책 설정
     if sys.platform == "win32" and sys.version_info >= (3, 8):
         asyncio.set_event_loop_policy(asyncio.SelectorEventLoopPolicy())
-    uvicorn.run("main:app", host="127.0.0.1", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=1492)
