@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 
 from api.v1.routers import api_router
 from fastapi.security import APIKeyHeader
+from api.v1.endpoints.chat import router as chat_router
+from api.v1.endpoints.recipe import router as recipe_router
 
 if sys.platform.startswith("win") and sys.version_info >= (3, 8):
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
@@ -73,6 +75,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1/users/chat", tags=["chat"])
+app.include_router(recipe_router, prefix="/api/v1/recipes", tags=["recipes"])
 
 
 if __name__ == "__main__":

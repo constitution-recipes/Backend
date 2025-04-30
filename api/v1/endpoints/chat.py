@@ -1,0 +1,49 @@
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Optional
+import requests
+from core.config import AI_DATA_URL
+
+class ChatProxyRequest(BaseModel):
+    session_id: Optional[str] = None
+    feature: Optional[str] = None
+    messages: list[dict[str, str]]
+
+class ChatProxyResponse(BaseModel):
+    message: str
+    is_recipe: bool = False
+
+router = APIRouter()
+
+@router.post(
+    "",
+    response_model=ChatProxyResponse,
+    summary="사용자-LLM 프록시 챗",
+    description="클라이언트 대화를 LLM 서비스로 프록시하고, 응답을 반환합니다."
+)
+async def proxy_chat(req: ChatProxyRequest):
+    try:
+        print(f"AI_DATA_URL: {AI_DATA_URL}")
+        print(f"req: {req.dict()}")
+        url = f"{AI_DATA_URL}/api/v1/users/chat"
+        payload = {"messages": [{"role": m["role"], "content": m["content"]} for m in req.messages]}
+        if req.session_id:
+            payload["session_id"] = req.session_id
+        if req.feature:
+            payload["feature"] = req.feature
+        resp = requests.post(url, json=payload, timeout=None)
+        print(f"status_code: {resp.status_code}")
+        try:
+            data = resp.json()
+            print(f"data: {data}")
+        except Exception as json_err:
+            print(f"JSON decode error: {json_err}")
+            print(f"Response text: {resp.text}")
+            raise HTTPException(status_code=500, detail=f"AI 서버 응답이 JSON이 아님: {resp.text}")
+        resp.raise_for_status()
+        if "message" not in data:
+            raise HTTPException(status_code=500, detail=f"AI 서버 응답에 'message' 필드가 없음: {data}")
+        return ChatProxyResponse(message=data["message"], is_recipe=data.get("is_recipe", False))
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e)) 
