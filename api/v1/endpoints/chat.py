@@ -1,8 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional
 import requests
 from core.config import AI_DATA_URL
+import json
+from db.session import get_recipe_db
+from crud.recipe import create_recipe as crud_create_recipe
+import httpx
 
 class ChatProxyRequest(BaseModel):
     session_id: Optional[str] = None
@@ -21,7 +25,7 @@ router = APIRouter()
     summary="사용자-LLM 프록시 챗",
     description="클라이언트 대화를 LLM 서비스로 프록시하고, 응답을 반환합니다."
 )
-async def proxy_chat(req: ChatProxyRequest):
+async def proxy_chat(req: ChatProxyRequest, request: Request):
     try:
         print(f"AI_DATA_URL: {AI_DATA_URL}")
         print(f"req: {req.dict()}")
@@ -41,6 +45,21 @@ async def proxy_chat(req: ChatProxyRequest):
             print(f"Response text: {resp.text}")
             raise HTTPException(status_code=500, detail=f"AI 서버 응답이 JSON이 아님: {resp.text}")
         resp.raise_for_status()
+        if data.get("is_recipe") and isinstance(data.get("message"), str):
+            try:
+                recipes_list = json.loads(data["message"])
+                # 현재 요청 URL에서 '/api/v1/' 이전 호스트 정보 추출
+                api_base = str(request.url).split("/api/v1/")[0]
+                stored = []
+                async with httpx.AsyncClient() as client:
+                    for recipe in recipes_list:
+                        r = await client.post(f"{api_base}/api/v1/recipes", json=recipe)
+                        r.raise_for_status()
+                        stored.append(r.json())
+                data["message"] = json.dumps(stored, ensure_ascii=False)
+                print("레시피 API 저장 및 업데이트 성공: total=", len(stored))
+            except Exception as e:
+                print("레시피 API 저장 실패:", e)
         if "message" not in data:
             raise HTTPException(status_code=500, detail=f"AI 서버 응답에 'message' 필드가 없음: {data}")
         return ChatProxyResponse(message=data["message"], is_recipe=data.get("is_recipe", False))
