@@ -74,9 +74,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close()  # 명시적으로 연결 종료
 
 
-app.include_router(api_router, prefix="/api/v1")
-app.include_router(chat_router, prefix="/api/v1/users/chat", tags=["chat"])
-app.include_router(recipe_router, prefix="/api/v1/recipes", tags=["recipes"])
+app.include_router(api_router, prefix="/api/v1")  # api_router에 user/chat/recipe 라우터 모두 포함됨
 
 
 if __name__ == "__main__":

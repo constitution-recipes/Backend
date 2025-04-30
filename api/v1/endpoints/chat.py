@@ -53,7 +53,7 @@ async def proxy_chat(req: ChatProxyRequest, request: Request):
                 stored = []
                 async with httpx.AsyncClient() as client:
                     for recipe in recipes_list:
-                        r = await client.post(f"{api_base}/api/v1/recipes", json=recipe)
+                        r = await client.post(f"{api_base}/api/v1/recipes/save", json=recipe)
                         r.raise_for_status()
                         stored.append(r.json())
                 data["message"] = json.dumps(stored, ensure_ascii=False)
