@@ -16,6 +16,9 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 # .env 파일 복사 (앱 소스 복사 이후, CMD/ENTRYPOINT 이전)
 COPY .env .env
+# .env파일 복사 테스트용
+RUN cat .env
+
 # 포트 노출
 EXPOSE 1492
 
