@@ -15,6 +15,7 @@ from pydantic import BaseModel
 import requests
 from core.config import AI_DATA_URL
 from typing import Optional
+from schemas.recipe import Recipe as RecipeSchema  # 레시피 스키마 import
 
 router = APIRouter()
 
@@ -179,3 +180,11 @@ async def proxy_chat(req: ChatProxyRequest):
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/recipes", response_model=RecipeSchema)
+async def create_recipe(recipe: RecipeSchema, db=Depends(get_db)):
+    """레시피 정보를 받아 MongoDB에 저장합니다."""
+    recipe_dict = recipe.model_dump()
+    result = await db["recipes"].insert_one(recipe_dict)
+    recipe_dict["id"] = str(result.inserted_id)
+    return recipe_dict
