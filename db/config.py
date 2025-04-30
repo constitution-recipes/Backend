@@ -1,6 +1,10 @@
 # db/config.py
-from core.config import MONGO_URL, MONGO_DB_NAME  # core에서 환경변수 로드한 값 사용
+from core.config import MONGO_URL, MONGO_USER_DB_NAME, MONGO_RECIPE_DB_NAME  # core 설정에서 환경변수 로드
 
-# MongoDB 연결을 위한 추가 설정
-def get_db_url():
-    return f"{MONGO_URL}{MONGO_DB_NAME}"  # DB 이름을 URL 끝에 추가하여 반환
+# 사용자 정보용 DB URL
+def get_user_db_url():
+    return f"{MONGO_URL}{MONGO_USER_DB_NAME}"
+
+# 레시피 정보용 DB URL
+def get_recipe_db_url():
+    return f"{MONGO_URL}{MONGO_RECIPE_DB_NAME}"
