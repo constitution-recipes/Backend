@@ -50,7 +50,13 @@ def custom_openapi():
 
 app.openapi = custom_openapi
 
-# FastAPI에 CORS 예외 URL을 등록
+# # FastAPI에 CORS 예외 URL을 등록
+# origins = [
+#     #"http://127.0.0.1:5173",    # 또는 "http://localhost:5173"
+#     "http://localhost:3001",
+#     "http://127.0.0.1:3001",
+# ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 모든 origin 허용 (개발용)

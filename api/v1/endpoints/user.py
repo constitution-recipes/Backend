@@ -33,6 +33,8 @@ async def update_profile(
     user_id: str = Depends(get_current_user),
     db=Depends(get_user_db),
 ):
+    print('profile object:', profile)
+    print('profile.illnesses:', profile.illnesses)
     await db["users"].update_one(
         {"_id": ObjectId(user_id)},
         {"$set": profile.model_dump(exclude_unset=True)}
