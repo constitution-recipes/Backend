@@ -14,6 +14,7 @@ client = AsyncIOMotorClient(
 # 분리된 데이터베이스 인스턴스
 user_db = client.get_database(settings.MONGO_USER_DB_NAME)
 recipe_db = client.get_database(settings.MONGO_RECIPE_DB_NAME)
+chat_db = client.get_database(settings.MONGO_CHAT_DB_NAME)
 
 def get_user_db():
     try:
@@ -24,5 +25,11 @@ def get_user_db():
 def get_recipe_db():
     try:
         yield recipe_db
+    finally:
+        pass  # DB 연결을 자동으로 종료할 필요가 있을 때 적절한 코드 추가
+
+def get_chat_db():
+    try:
+        yield chat_db
     finally:
         pass  # DB 연결을 자동으로 종료할 필요가 있을 때 적절한 코드 추가

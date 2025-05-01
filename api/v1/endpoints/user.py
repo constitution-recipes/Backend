@@ -49,9 +49,25 @@ async def login(
     db_user = await get_user_by_email(db, username)
     if not db_user or not verify_password(password, db_user["password"]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    access_token = create_access_token(data={"sub": str(db_user["id"])})
+    access_token = create_access_token(data={"sub": str(db_user["_id"])})
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/logout")
 async def logout():
     return {"msg": "Logged out successfully"}
+
+@router.get(
+    "/me",
+    response_model=UserOut,
+    summary="현재 로그인 사용자 프로필 조회",
+    description="토큰을 통해 현재 로그인한 사용자 정보를 반환합니다."
+)
+async def get_current_user_profile(
+    token: str = Security(oauth2_scheme),
+    user_id: str = Depends(get_current_user),
+    db=Depends(get_user_db)
+):
+    user_doc = await db["users"].find_one({"_id": ObjectId(user_id)})
+    if not user_doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return UserOut.from_mongo(user_doc)
