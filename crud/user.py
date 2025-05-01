@@ -24,11 +24,9 @@ async def create_user(db, user: UserCreate):
     user_dict = user.model_dump(by_alias=False)
     print('user_dict to insert:', user_dict)  # 실제 저장되는 dict 확인용
     result = await db["users"].insert_one(user_dict)
-
-    # 실제 삽입된 _id를 사용하여 반환 객체 구성
-    user_dict["_id"] = result.inserted_id
+    # _id 대신 id 필드만 남기고, 비밀번호 제거
     user_dict["id"] = str(result.inserted_id)
-    user_dict.pop("password", None)  # 보안상 제거
+    user_dict.pop("password", None)
     return user_dict
 
 

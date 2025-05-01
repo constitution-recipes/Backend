@@ -3,10 +3,13 @@ from pydantic_settings import BaseSettings  # pydantic-settings에서 BaseSettin
 
 class Settings(BaseSettings):
     MONGO_URL: str  # MongoDB Atlas 연결 URL (db name 제외)
-    MONGO_DB_NAME: str  # MongoDB 데이터베이스 이름
+    MONGO_USER_DB_NAME: str   # 사용자 정보용 DB 이름
+    MONGO_RECIPE_DB_NAME: str # 레시피 정보용 DB 이름
+    MONGO_CHAT_DB_NAME: str   # 채팅 정보용 DB 이름
     SECRET_KEY: str  # 비밀 키
     ALGORITHM: str  # 기본 알고리즘 설정 (선택사항)
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    AI_DATA_URL: str
 
     class Config:
         # .env 파일에서 환경변수를 읽어옵니다.
@@ -18,7 +21,10 @@ settings = Settings()
 
 # 환경 변수에 접근할 때는 `settings` 객체를 통해 접근합니다.
 MONGO_URL = settings.MONGO_URL
-MONGO_DB_NAME = settings.MONGO_DB_NAME
+MONGO_USER_DB_NAME = settings.MONGO_USER_DB_NAME
+MONGO_RECIPE_DB_NAME = settings.MONGO_RECIPE_DB_NAME
+MONGO_CHAT_DB_NAME = settings.MONGO_CHAT_DB_NAME
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+AI_DATA_URL = settings.AI_DATA_URL

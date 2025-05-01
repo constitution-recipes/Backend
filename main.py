@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 
 from api.v1.routers import api_router
 from fastapi.security import APIKeyHeader
+from api.v1.endpoints.chat import router as chat_router
+from api.v1.endpoints.recipe import router as recipe_router
 
 if sys.platform.startswith("win") and sys.version_info >= (3, 8):
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
@@ -78,7 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close()  # 명시적으로 연결 종료
 
 
-app.include_router(api_router)
+app.include_router(api_router, prefix="/api/v1")  # api_router에 user/chat/recipe 라우터 모두 포함됨
 
 
 if __name__ == "__main__":

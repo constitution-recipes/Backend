@@ -1,5 +1,6 @@
 # db/mongo.py
 from motor.motor_asyncio import AsyncIOMotorClient
+import certifi
 from core.config import settings  # BaseSettings 인스턴스 import
 from pymongo.collection import Collection
 from pymongo.errors import ConnectionFailure  # MongoDB 연결 오류 처리
@@ -14,8 +15,12 @@ async def init_db(app=None):
     global client, db
     try:
         # MongoDB 연결
-        client = AsyncIOMotorClient(settings.MONGO_URL)
-        db_name = settings.MONGO_DB_NAME  # config에서 분리해서 받는 게 안전
+        client = AsyncIOMotorClient(
+            settings.MONGO_URL,
+            tls=True,
+            tlsCAFile=certifi.where()
+        )
+        db_name = settings.MONGO_USER_DB_NAME  # 사용자 정보용 기본 DB 이름
         db = client[db_name]
 
         # 연결이 성공했는지 확인 (간단히 ping 테스트)
