@@ -21,7 +21,8 @@ from bson import ObjectId
 #     return {**user_dict, "id": str(result.inserted_id)}  # 반환할 때 id는 삽입된 MongoDB 문서의 _id를 사용
 
 async def create_user(db, user: UserCreate):
-    user_dict = user.model_dump()
+    user_dict = user.model_dump(by_alias=False)
+    print('user_dict to insert:', user_dict)  # 실제 저장되는 dict 확인용
     result = await db["users"].insert_one(user_dict)
     # _id 대신 id 필드만 남기고, 비밀번호 제거
     user_dict["id"] = str(result.inserted_id)
