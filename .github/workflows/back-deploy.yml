@@ -5,42 +5,17 @@ on:
       - develop
     tags:
       - '*'
-permissions:
-  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          python-version: '3.10'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Create .env file
-        run: |
-          echo "MONGO_URL=${{ secrets.MONGO_URL }}" > .env
-          echo "MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}" >> .env
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
-          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> .env
-          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> .env
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
@@ -49,21 +24,12 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_REPOSITORY }}:${{ github.ref_name }}
-            ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_REPOSITORY }}:latest
-          labels: version=${{ github.ref_name }}
+            ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_REPOSITORY }}:backend-${{ github.ref_name }}
+            ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_REPOSITORY }}:backend-latest
 
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@master
+      - name: Trigger Deploy repo
+        uses: peter-evans/repository-dispatch@v3
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: DOCKER_USERNAME,DOCKER_PASSWORD
-          script: |
-            cd /home/${{ secrets.SERVER_USER }}/deploy
-            ./deploy.sh
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}          
-      
+          token: ${{ secrets.DEPLOY_REPO_TOKEN }}
+          repository: constitution-recipes/Deploy
+          event-type: backend-updated 
