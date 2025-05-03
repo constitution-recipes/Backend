@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from datetime import datetime
 
 class Recipe(BaseModel):
     id: Optional[str] = Field(None, description="레시피 고유 ID")
@@ -17,3 +18,12 @@ class Recipe(BaseModel):
     steps: list[str] = Field(..., description="조리 단계 리스트")
     servings: str = Field(..., description="인분 정보")
     nutritionalInfo: str = Field(..., description="영양 정보")
+
+class BookmarkCreate(BaseModel):
+    recipe_id: str = Field(..., description="레시피 ID")
+
+class BookmarkOut(BaseModel):
+    id: Optional[str] = Field(None, description="북마크 고유 ID")
+    user_id: str = Field(..., description="유저 ID")
+    recipe_id: str = Field(..., description="레시피 ID")
+    created_at: Optional[datetime] = Field(None, description="생성일시")

@@ -1,4 +1,8 @@
 from bson import ObjectId
+from datetime import datetime
+from db.mongo import get_collection
+
+BOOKMARK_COLLECTION = "bookmarks"
 
 async def create_recipe(db, recipe_data: dict) -> dict:
     """MongoDB 'recipes' 컬렉션에 레시피를 저장하고, id 필드를 문자열로 변환해 반환합니다."""
@@ -14,4 +18,27 @@ async def get_recipe_by_id(db, recipe_id: str) -> dict | None:
     if not doc:
         return None
     doc['id'] = str(doc['_id'])
-    return doc 
+    return doc
+
+async def add_bookmark(user_id: str, recipe_id: str):
+    collection = get_collection(BOOKMARK_COLLECTION)
+    bookmark = {
+        "user_id": user_id,
+        "recipe_id": recipe_id,
+        "created_at": datetime.utcnow(),
+    }
+    result = await collection.insert_one(bookmark)
+    bookmark["id"] = str(result.inserted_id)
+    return bookmark
+
+async def remove_bookmark(user_id: str, recipe_id: str):
+    collection = get_collection(BOOKMARK_COLLECTION)
+    result = await collection.delete_one({"user_id": user_id, "recipe_id": recipe_id})
+    return {"deleted": result.deleted_count}
+
+async def get_user_bookmarks(user_id: str):
+    collection = get_collection(BOOKMARK_COLLECTION)
+    bookmarks = await collection.find({"user_id": user_id}).to_list(length=1000)
+    for b in bookmarks:
+        b["id"] = str(b["_id"])
+    return bookmarks 
