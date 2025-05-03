@@ -18,6 +18,7 @@ async def get_user_chat_sessions(db, user_id: str):
     sessions = await db["chat_sessions"].find({"user_id": user_id}).sort("updated_at", -1).to_list(100)
     # 디버깅: 세션 조회 로그
     print(f"[DEBUG][chat] Retrieved {len(sessions)} sessions for user {user_id}")
+    print("전메세지:",  sessions[0])
     return [
         {
             "id": str(s["_id"]),
@@ -47,6 +48,7 @@ async def add_chat_message(db, session_id: str, role: str, content: str):
 
 async def get_session_messages(db, session_id: str):
     msgs = await db["chat_messages"].find({"session_id": ObjectId(session_id)}).sort("created_at", 1).to_list(1000)
+    print("메세지:", msgs)
     return [
         {
             "id": str(m["_id"]),

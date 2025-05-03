@@ -42,6 +42,9 @@ class UserOut(BaseModel):
     health_status: Optional[str] = Field(None, alias='healthStatus')
     health_goals: Optional[List[str]] = Field(None, alias='healthGoals')
     illnesses: Optional[str] = None
+    constitution: Optional[str] = None
+    constitution_reason: Optional[str] = None
+    constitution_confidence: Optional[float] = None
 
     class Config:
         orm_mode = True
@@ -70,6 +73,9 @@ class UserOut(BaseModel):
         doc.setdefault("health_goals", None)
         doc.setdefault("healthGoals", None)
         doc.setdefault("illnesses", None)
+        doc.setdefault("constitution", None)
+        doc.setdefault("constitution_reason", None)
+        doc.setdefault("constitution_confidence", None)
 
         return doc
 

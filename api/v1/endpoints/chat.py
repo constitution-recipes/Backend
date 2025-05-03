@@ -40,7 +40,7 @@ async def proxy_chat(
             last_msg = req.messages[-1]
             if last_msg.get('role') == 'user':
                 await crud_add_chat_message(chat_db, req.session_id, 'user', last_msg.get('content'))
-        url = f"{AI_DATA_URL}/api/v1/users/chat"
+        url = f"{AI_DATA_URL}/api/v1/constitution_recipe"
         payload = {"messages": [{"role": m["role"], "content": m["content"]} for m in req.messages]}
         if req.session_id:
             payload["session_id"] = req.session_id
