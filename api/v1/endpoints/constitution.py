@@ -42,11 +42,12 @@ async def proxy_constitution(
             raise HTTPException(status_code=500, detail=f"LLM 응답 JSON 파싱 실패: {err}")
         resp.raise_for_status()
         # 진단 완료 시 DB 업데이트
+        print(f"진단 결과: {data}")
         if data.get("can_diagnose") and data.get("constitution"):
             update_fields = {
                 "constitution": data["constitution"],
-                "constitution_reason": data.get("reason", ""),
-                "constitution_confidence": float(data.get("confidence", 0)),
+                "constitution_reason": data["reason"],
+                "constitution_confidence": data["confidence"]
             }
             await db["users"].update_one({"_id": ObjectId(user_id)}, {"$set": update_fields})
         # 결과 반환
