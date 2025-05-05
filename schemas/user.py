@@ -59,23 +59,29 @@ class UserOut(BaseModel):
     @staticmethod
     def _preprocess_document(document: dict) -> dict:
         doc = document.copy()
-
         # _id → id 변환
         doc["id"] = str(doc.get("_id", ""))
         doc.pop("_id", None)
 
+        # snake_case → camelCase 변환
+        if "phone_number" in doc:
+            doc["phoneNumber"] = doc["phone_number"]
+        if "health_status" in doc:
+            doc["healthStatus"] = doc["health_status"]
+        if "health_goals" in doc:
+            doc["healthGoals"] = doc["health_goals"]
+        if "illnesses" in doc:
+            doc["existingConditions"] = doc["illnesses"]
+
         # 누락된 필드 기본값 보정
-        doc.setdefault("phone_number", None)
         doc.setdefault("phoneNumber", None)
         doc.setdefault("allergies", None)
-        doc.setdefault("health_status", None)
         doc.setdefault("healthStatus", None)
-        doc.setdefault("health_goals", None)
         doc.setdefault("healthGoals", None)
-        doc.setdefault("illnesses", None)
+        doc.setdefault("existingConditions", None)
         doc.setdefault("constitution", None)
-        doc.setdefault("constitution_reason", None)
-        doc.setdefault("constitution_confidence", None)
+        doc.setdefault("constitutionReason", None)
+        doc.setdefault("constitutionConfidence", None)
 
         return doc
 
