@@ -4,6 +4,9 @@ from schemas.recipe import Recipe, BookmarkCreate, BookmarkOut
 from crud.recipe import create_recipe as crud_create_recipe, get_recipe_by_id as crud_get_recipe_by_id, add_bookmark, remove_bookmark, get_user_bookmarks
 from crud.user import get_current_user, oauth2_scheme
 from typing import List
+from schemas.auto_generate import AutoGenerateRecipeRequest
+import httpx
+from core.config import AI_DATA_URL
 
 router = APIRouter()
 
@@ -66,3 +69,18 @@ async def create_recipe(recipe: Recipe, db=Depends(get_recipe_db)):
 # ):
 #     return await get_user_bookmarks(user_id)
     return await crud_create_recipe(db, recipe.model_dump()) 
+
+@router.post(
+    "/auto_generate",
+    response_model=List[Recipe],
+    summary="자동 레시피 생성",
+    description="체질 및 선택 항목 기반 자동 레시피 생성"
+)
+async def auto_generate_recipe(req: AutoGenerateRecipeRequest):
+    """Ai-Data LLM 서비스에 요청해 자동 생성된 레시피를 반환합니다."""
+    url = f"{AI_DATA_URL}/api/v1/constitution_recipe/auto_generate"
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(url, json=req.dict())
+    if resp.status_code != 200:
+        raise HTTPException(status_code=resp.status_code, detail="LLM 레시피 생성 실패")
+    return resp.json() 

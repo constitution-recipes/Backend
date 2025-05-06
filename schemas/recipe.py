@@ -18,6 +18,8 @@ class Recipe(BaseModel):
     steps: list[str] = Field(..., description="조리 단계 리스트")
     servings: str = Field(..., description="인분 정보")
     nutritionalInfo: str = Field(..., description="영양 정보")
+    category: str = Field(..., description="카테고리 (한식, 중식 등)")
+    keyIngredients: list[str] = Field(..., description="중요 재료 목록 (육류, 해산물 등)")
 
 class BookmarkCreate(BaseModel):
     recipe_id: str = Field(..., description="레시피 ID")
