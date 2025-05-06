@@ -29,6 +29,9 @@ class TestRequest(BaseModel):
 class TestResponse(BaseModel):
     experiment_id: str
     overall_average: float
+    provider: str
+    model: str
+    prompt_str: str
     results: List[Dict[str, Any]]
 
 router = APIRouter()
@@ -64,6 +67,9 @@ async def test_experiment(req: TestRequest, db=Depends(get_recipe_db)):
             item['model'] = req.model
             item['prompt_str'] = req.prompt_str
             item['created_at'] = datetime.utcnow()
+            # recipe_json 필드가 없으면 {}로
+            if 'recipe_json' not in item or item['recipe_json'] is None:
+                item['recipe_json'] = {}
             # DB 저장
             await create_experiment(db, item)
             # 내부 MongoDB ObjectId 제거
@@ -72,6 +78,9 @@ async def test_experiment(req: TestRequest, db=Depends(get_recipe_db)):
         return TestResponse(
             experiment_id=experiment_id,
             overall_average=overall_average,
+            provider=req.provider,
+            model=req.model,
+            prompt_str=req.prompt_str,
             results=results
         )
     except Exception as e:
@@ -91,8 +100,13 @@ async def list_experiments(db=Depends(get_recipe_db)):
         grouped.setdefault(exp_id, []).append(doc)
     response_list: List[TestResponse] = []
     for exp_id, items in grouped.items():
-        # 전체 평균 재계산
-        overall_avg = sum(item.get('average_score', 0) for item in items) / len(items) if items else 0.0
+        # recipe_score만으로 평균 계산
+        recipe_scores = [item.get('recipe_score', 0) for item in items]
+        overall_avg = sum(recipe_scores) / len(recipe_scores) if recipe_scores else 0.0
+        # 대표 provider/model/prompt_str (첫번째)
+        provider = items[0].get('provider', '-') if items else '-'
+        model = items[0].get('model', '-') if items else '-'
+        prompt_str = items[0].get('prompt_str', '-') if items else '-'
         results: List[Dict[str, Any]] = []
         for item in items:
             results.append({
@@ -104,10 +118,27 @@ async def list_experiments(db=Depends(get_recipe_db)):
                 'recipe_score': item.get('recipe_score', 0),
                 'average_score': item.get('average_score', 0),
                 'timestamp': item.get('created_at'),
+                'provider': item.get('provider', '-'),
+                'model': item.get('model', '-'),
+                'prompt_str': item.get('prompt_str', '-'),
+                'recipe_json': item.get('recipe_json', None)
             })
         response_list.append(TestResponse(
             experiment_id=exp_id,
             overall_average=overall_avg,
+            provider=provider,
+            model=model,
+            prompt_str=prompt_str,
             results=results
         ))
-    return response_list 
+    return response_list
+
+@router.delete("/{experiment_id}", summary="experiment_id로 실험 전체 삭제")
+async def delete_experiment(experiment_id: str, db=Depends(get_recipe_db)):
+    try:
+        result = await db['experiments'].delete_many({"experiment_id": experiment_id})
+        return {"deleted_count": result.deleted_count}
+    except Exception as e:
+        print('experiment.py DELETE 예외 발생:', str(e))
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e)) 
