@@ -13,6 +13,11 @@ class ChatProxyRequest(BaseModel):
     session_id: Optional[str] = None
     feature: Optional[str] = None
     messages: list[dict[str, str]]
+    # 사용자 컨텍스트 필드 추가
+    allergies: Optional[list[str]] = None
+    constitution: Optional[str] = None
+    dietary_restrictions: Optional[list[str]] = None
+    health_conditions: Optional[str] = None
 
 class ChatProxyResponse(BaseModel):
     message: str
@@ -41,11 +46,16 @@ async def proxy_chat(
             if last_msg.get('role') == 'user':
                 await crud_add_chat_message(chat_db, req.session_id, 'user', last_msg.get('content'))
         url = f"{AI_DATA_URL}/api/v1/constitution_recipe"
-        payload = {"messages": [{"role": m["role"], "content": m["content"]} for m in req.messages]}
-        if req.session_id:
-            payload["session_id"] = req.session_id
-        if req.feature:
-            payload["feature"] = req.feature
+        # AI 서버로 보낼 payload에 사용자 컨텍스트 포함
+        payload = {
+            "messages": [{"role": m["role"], "content": m["content"]} for m in req.messages],
+            "session_id": req.session_id,
+            "feature": req.feature,
+            "allergies": req.allergies,
+            "constitution": req.constitution,
+            "dietary_restrictions": req.dietary_restrictions,
+            "health_conditions": req.health_conditions
+        }
         resp = requests.post(url, json=payload, timeout=None)
         print(f"status_code: {resp.status_code}")
         try:
