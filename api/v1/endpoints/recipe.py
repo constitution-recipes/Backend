@@ -4,6 +4,9 @@ from schemas.recipe import Recipe, BookmarkCreate, BookmarkOut
 from crud.recipe import create_recipe as crud_create_recipe, get_recipe_by_id as crud_get_recipe_by_id, add_bookmark, remove_bookmark, get_user_bookmarks
 from crud.user import get_current_user, oauth2_scheme
 from typing import List
+from schemas.auto_generate import AutoGenerateRecipeRequest
+import httpx
+from core.config import AI_DATA_URL
 
 router = APIRouter()
 
@@ -66,3 +69,56 @@ async def create_recipe(recipe: Recipe, db=Depends(get_recipe_db)):
 # ):
 #     return await get_user_bookmarks(user_id)
     return await crud_create_recipe(db, recipe.model_dump()) 
+
+@router.post(
+    "/auto_generate",
+    response_model=List[Recipe],
+    summary="자동 레시피 생성",
+    description="체질 및 선택 항목 기반 자동 레시피 생성"
+)
+async def auto_generate_recipe(req: AutoGenerateRecipeRequest, db=Depends(get_recipe_db)):
+    """Ai-Data LLM 서비스에 요청해 자동 생성된 레시피를 반환합니다."""
+    url = f"{AI_DATA_URL}/api/v1/constitution_recipe/auto_generate"
+    # LLM 서비스 호출: timeout 및 오류 처리
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        try:
+            resp = await client.post(url, json=req.dict())
+            resp.raise_for_status()
+        except httpx.ReadTimeout:
+            raise HTTPException(status_code=504, detail="LLM 레시피 서비스 호출 타임아웃")
+        except httpx.HTTPError as e:
+            raise HTTPException(status_code=502, detail=f"LLM 레시피 생성 실패: {e}")
+    # JSON 응답 파싱
+    try:
+        generated = resp.json()
+    except ValueError:
+        raise HTTPException(status_code=502, detail="LLM 응답 JSON 파싱 실패")
+
+    # DB에 저장 및 반환
+    saved_recipes: list[dict] = []
+    for item in generated:
+        saved = await crud_create_recipe(db, item)
+        saved_recipes.append(saved)
+    return saved_recipes 
+
+@router.delete(
+    "/delete_all",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="모든 레시피 삭제",
+    description="MongoDB 'recipes' 컬렉션의 모든 레시피를 삭제합니다."
+)
+async def delete_all_recipes(db=Depends(get_recipe_db)):
+    """저장된 모든 레시피를 삭제합니다."""
+    try:
+        result = await db['recipes'].delete_many({})
+        if result.deleted_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="삭제할 레시피가 없습니다."
+            )
+        return {"message": f"{result.deleted_count}개의 레시피가 삭제되었습니다."}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"레시피 삭제 중 오류가 발생했습니다: {str(e)}"
+        ) 
