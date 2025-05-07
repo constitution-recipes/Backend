@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Security
 from db.session import get_recipe_db
-from schemas.recipe import Recipe, BookmarkCreate, BookmarkOut
-from crud.recipe import create_recipe as crud_create_recipe, get_recipe_by_id as crud_get_recipe_by_id, add_bookmark, remove_bookmark, get_user_bookmarks
+from schemas.recipe import Recipe, BookmarkCreate, BookmarkOut, RecipeUpdateRequest
+from crud.recipe import create_recipe as crud_create_recipe, get_recipe_by_id as crud_get_recipe_by_id, add_bookmark, remove_bookmark, get_user_bookmarks, update_recipe as crud_update_recipe
 from crud.user import get_current_user, oauth2_scheme
 from typing import List
 from schemas.auto_generate import AutoGenerateRecipeRequest
@@ -122,3 +122,16 @@ async def delete_all_recipes(db=Depends(get_recipe_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"레시피 삭제 중 오류가 발생했습니다: {str(e)}"
         ) 
+
+@router.patch(
+    "/{recipe_id}/edit",
+    response_model=Recipe,
+    summary="레시피 수정 및 수정 사유 저장",
+    description="레시피 필드를 수정하고 수정 사유를 기록합니다."
+)
+async def update_recipe_endpoint(recipe_id: str, req: RecipeUpdateRequest, db=Depends(get_recipe_db)):
+    existing = await crud_get_recipe_by_id(db, recipe_id)
+    if not existing:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="레시피를 찾을 수 없습니다.")
+    updated = await crud_update_recipe(db, recipe_id, req.model_dump())
+    return updated 

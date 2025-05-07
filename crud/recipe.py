@@ -41,4 +41,17 @@ async def get_user_bookmarks(user_id: str):
     bookmarks = await collection.find({"user_id": user_id}).to_list(length=1000)
     for b in bookmarks:
         b["id"] = str(b["_id"])
-    return bookmarks 
+    return bookmarks
+
+async def update_recipe(db, recipe_id: str, update_data: dict) -> dict:
+    """주어진 ID의 레시피를 수정하고 수정 사유를 저장한 후, 수정된 레시피를 반환합니다."""
+    reason = update_data.pop('editReason', None)
+    update_set = update_data
+    if reason is not None:
+        update_set['lastEditReason'] = reason
+        update_set['lastEditedAt'] = datetime.utcnow()
+    if update_set:
+        await db['recipes'].update_one({'_id': ObjectId(recipe_id)}, {'$set': update_set})
+    doc = await db['recipes'].find_one({'_id': ObjectId(recipe_id)})
+    doc['id'] = str(doc['_id'])
+    return doc 
