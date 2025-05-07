@@ -40,6 +40,8 @@ class TestResponse(BaseModel):
     avg_cost_per_message: Optional[float] = None  # 메시지당 평균 비용 추가
     cost_score: Optional[float] = None  # 비용 기반 정규화 점수
     combined_score: Optional[float] = None  # 레시피 점수와 비용 점수의 조합
+    duration: Optional[int] = None  # 실험 총 소요 시간 (ms)
+    time_per_message: Optional[float] = None  # 메시지당 평균 소요 시간 (ms)
 
 router = APIRouter()
 
@@ -90,6 +92,7 @@ def combine_scores(recipe_score, cost_score, recipe_weight=0.7, cost_weight=0.3)
 @router.post("/test", response_model=TestResponse, summary="모델 및 프롬프트 테스트 및 저장")
 async def test_experiment(req: TestRequest, db=Depends(get_recipe_db)):
     try:
+        start_time = datetime.now()
         # LLM 마이크로서비스 호출
         resp = requests.post(
             f"{AI_DATA_URL}/api/v1/constitution_recipe/test",
@@ -100,6 +103,10 @@ async def test_experiment(req: TestRequest, db=Depends(get_recipe_db)):
         print("resp",resp)
         data = resp.json()
         results = data.get('results', [])
+        end_time = datetime.now()
+        duration_ms = int((end_time - start_time).total_seconds() * 1000)
+        message_count = len(results)
+        time_per_message = duration_ms / message_count if message_count > 0 else None
         
         # 토큰 정보 추출
         total_input_tokens = data.get('total_input_tokens', 0)
@@ -156,6 +163,8 @@ async def test_experiment(req: TestRequest, db=Depends(get_recipe_db)):
             'avg_cost_per_message': avg_cost_per_message,
             'cost_score': cost_score,
             'combined_score': combined_score,
+            'duration': duration_ms,
+            'time_per_message': time_per_message,
             'created_at': datetime.utcnow()
         }
         await db['experiment_tokens'].insert_one(token_info)
@@ -173,7 +182,9 @@ async def test_experiment(req: TestRequest, db=Depends(get_recipe_db)):
             total_cost=total_cost,
             avg_cost_per_message=avg_cost_per_message,
             cost_score=cost_score,
-            combined_score=combined_score
+            combined_score=combined_score,
+            duration=duration_ms,
+            time_per_message=time_per_message
         )
     except Exception as e:
         print('experiment.py 예외 발생:', str(e))
@@ -267,7 +278,9 @@ async def list_experiments(db=Depends(get_recipe_db)):
             total_cost=total_cost,
             avg_cost_per_message=avg_cost_per_message,
             cost_score=cost_score,
-            combined_score=combined_score
+            combined_score=combined_score,
+            duration=token_info.get('duration'),
+            time_per_message=token_info.get('time_per_message')
         ))
     
     # 종합 점수 기준으로 정렬 (없으면 레시피 점수 기준)
