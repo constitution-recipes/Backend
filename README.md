@@ -47,12 +47,7 @@ docker run -d -p 6000:6000 backend
    ```bash
    pip install -r requirements.txt
    ```
-2. 환경 변수 설정 (`.env` 파일 생성)
-   ```env
-   MONGODB_URI=<your-mongodb-uri>
-   JWT_SECRET_KEY=<your-secret-key>
-   ```
-3. 개발 서버 실행
+2. 개발 서버 실행
    ```bash
    uvicorn main:app --reload --host 0.0.0.0 --port 6000
    ```
@@ -61,7 +56,7 @@ docker run -d -p 6000:6000 backend
 1. Docker 이미지 빌드 및 실행
    ```bash
    docker build -t chi-diet-backend .
-   docker run -d -p 1492:1492 chi-diet-backend
+   docker run -d -p 6000:6000 chi-diet-backend
    ```
 
 ## License
