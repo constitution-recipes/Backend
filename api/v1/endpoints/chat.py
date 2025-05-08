@@ -69,12 +69,13 @@ async def proxy_chat(
         if data.get("is_recipe") and isinstance(data.get("message"), str):
             try:
                 recipes_list = json.loads(data["message"])
-                # 현재 요청 URL에서 '/api/v1/' 이전 호스트 정보 추출
-                api_base = str(request.url).split("/api/v1/")[0]
+                # 리다이렉트 없이 올바른 스킴과 호스트를 사용하기 위해 base_url 활용
+                api_base = str(request.base_url).rstrip("/")
                 stored = []
-                async with httpx.AsyncClient() as client:
+                # 리다이렉트를 따라가도록 설정
+                async with httpx.AsyncClient(follow_redirects=True) as client:
                     for recipe in recipes_list:
-                        r = await client.post(f"{api_base}/api/v1/recipes/save", json=recipe)
+                        r = await client.post(f"{api_base}/api/v1/recipes/save", json=recipe, follow_redirects=True)
                         r.raise_for_status()
                         stored.append(r.json())
                 data["message"] = json.dumps(stored, ensure_ascii=False)

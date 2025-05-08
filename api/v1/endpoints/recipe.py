@@ -70,6 +70,10 @@ async def create_recipe(recipe: Recipe, db=Depends(get_recipe_db)):
 #     return await get_user_bookmarks(user_id)
     return await crud_create_recipe(db, recipe.model_dump()) 
 
+@router.post("/save/", include_in_schema=False)
+async def create_recipe_slash(recipe: Recipe, db=Depends(get_recipe_db)):
+    return await crud_create_recipe(db, recipe.model_dump())
+
 @router.post(
     "/auto_generate",
     response_model=List[Recipe],
